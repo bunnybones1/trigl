@@ -87,6 +87,13 @@ body {
 }
 
 .color.button .mask .interior {
+  width: 60px;
+  height: 420px;
+  top: -400px;
+  position: absolute;
+}
+
+.color.button .mask .interior.h {
   background-image: linear-gradient(
     rgb(255, 0, 0),
     rgb(255, 255, 0),
@@ -97,10 +104,18 @@ body {
     rgb(255, 0, 0),
     rgb(255, 255, 0)
   );
-  width: 60px;
-  height: 420px;
-  top: -400px;
-  position: absolute;
+}
+
+.color.button .mask .interior.s {
+  background-image: linear-gradient(rgb(255, 0, 0) 10%, rgb(127, 127, 127) 90%);
+}
+
+.color.button .mask .interior.v {
+  background-image: linear-gradient(
+    rgb(255, 255, 255) 10%,
+    rgb(255, 0, 0) 50%,
+    rgb(0, 0, 0) 90%
+  );
 }
 
 .color.button p {

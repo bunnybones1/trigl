@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { wrap } from "./utils/math/wrap";
+import { clamp } from "./utils/math/clamp";
 
 interface ColorSliderProps {
   open?: boolean;
@@ -15,6 +16,7 @@ function pauseEvent(e: PointerEvent) {
 }
 
 function ColorSlider(props: ColorSliderProps) {
+  const loop = props.type === "h";
   const storageKey = `colorSlider-${props.type}`;
   const [isDown, setIsDown] = useState(false);
   let yReset: undefined | number;
@@ -54,7 +56,10 @@ function ColorSlider(props: ColorSliderProps) {
       }
     >
       <div className="mask">
-        <div className="interior" style={{ top: wrap(y, -420 + 60, 0) }}></div>
+        <div
+          className={`interior ${props.type}`}
+          style={{ top: loop ? wrap(y, -420 + 60, 0) : clamp(-420 + 60, 0, y) }}
+        ></div>
         <p>{props.type.toLocaleUpperCase()}</p>
       </div>
     </div>

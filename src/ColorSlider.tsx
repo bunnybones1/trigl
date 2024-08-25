@@ -15,17 +15,21 @@ function pauseEvent(e: PointerEvent) {
 }
 
 function ColorSlider(props: ColorSliderProps) {
+  const storageKey = `colorSlider-${props.type}`;
   const [isDown, setIsDown] = useState(false);
   let yReset: undefined | number;
-  const [y, setY] = useState(0);
+  const [y, setY] = useState(
+    parseFloat(localStorage.getItem(storageKey) || "0")
+  );
   const onPointerMove = (ev: PointerEvent) => {
     pauseEvent(ev);
     if (yReset === undefined) {
       yReset = ev.clientY;
     } else {
-      setY(y + ev.clientY - yReset);
+      const newY = y + ev.clientY - yReset;
+      setY(newY);
+      localStorage.setItem(storageKey, newY.toString());
     }
-    console.log(yReset);
   };
   const onPointerUp = (ev: PointerEvent) => {
     pauseEvent(ev);

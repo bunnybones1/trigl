@@ -23,6 +23,7 @@ function pauseEvent(e: PointerEvent) {
 function ColorSlider(props: ColorSliderProps) {
   const { hue, saturation, value, setVal, type } = props;
   const loop = type === "h";
+  const reverse = type !== "h";
   const storageKey = `colorSlider-${type}`;
   const [isDown, setIsDown] = useState(false);
   let yReset: undefined | number;
@@ -34,7 +35,7 @@ function ColorSlider(props: ColorSliderProps) {
     if (yReset === undefined) {
       yReset = ev.clientY;
     } else {
-      const newY = y + ev.clientY - yReset;
+      const newY = y + (ev.clientY - yReset) * (reverse ? -1 : 1);
       const adjustedY = loop ? wrap(newY, 0, 360) : clamp(-420 + 60, 0, newY);
       setY(adjustedY);
       setVal(adjustedY);

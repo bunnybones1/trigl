@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { wrap } from "./utils/math/wrap";
 import { clamp } from "./utils/math/clamp";
+import { generateCssGradient } from "./utils/generateCssGradient";
 
 interface ColorSliderProps {
   open?: boolean;
   type: "h" | "s" | "v";
+  hue: number;
+  saturation: number;
+  value: number;
+  setVal: React.Dispatch<React.SetStateAction<number>>;
 }
 
 function pauseEvent(e: PointerEvent) {
@@ -16,8 +21,9 @@ function pauseEvent(e: PointerEvent) {
 }
 
 function ColorSlider(props: ColorSliderProps) {
-  const loop = props.type === "h";
-  const storageKey = `colorSlider-${props.type}`;
+  const { hue, saturation, value, setVal, type } = props;
+  const loop = type === "h";
+  const storageKey = `colorSlider-${type}`;
   const [isDown, setIsDown] = useState(false);
   let yReset: undefined | number;
   const [y, setY] = useState(
@@ -29,8 +35,10 @@ function ColorSlider(props: ColorSliderProps) {
       yReset = ev.clientY;
     } else {
       const newY = y + ev.clientY - yReset;
-      setY(newY);
-      localStorage.setItem(storageKey, newY.toString());
+      const adjustedY = loop ? wrap(newY, 0, 360) : clamp(-420 + 60, 0, newY);
+      setY(adjustedY);
+      setVal(adjustedY);
+      localStorage.setItem(storageKey, adjustedY.toFixed(0));
     }
   };
   const onPointerUp = (ev: PointerEvent) => {
@@ -42,12 +50,11 @@ function ColorSlider(props: ColorSliderProps) {
   };
   return (
     <div
-      className={`color button ${props.type}`}
+      className={`color button ${type}`}
       onPointerDown={
         !isDown
           ? (ev) => {
               pauseEvent(ev.nativeEvent);
-              console.log("down");
               document.addEventListener("pointermove", onPointerMove);
               document.addEventListener("pointerup", onPointerUp);
               setIsDown(true);
@@ -58,7 +65,10 @@ function ColorSlider(props: ColorSliderProps) {
       <div className="mask">
         <div
           className={`interior ${props.type}`}
-          style={{ top: loop ? wrap(y, -420 + 60, 0) : clamp(-420 + 60, 0, y) }}
+          style={{
+            top: loop ? wrap(y, -420 + 60, 0) : clamp(-420 + 60, 0, y),
+            backgroundImage: generateCssGradient(type, hue, saturation, value)
+          }}
         ></div>
         <p>{props.type.toLocaleUpperCase()}</p>
       </div>

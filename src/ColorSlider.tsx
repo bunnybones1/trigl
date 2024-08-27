@@ -3,12 +3,17 @@ import { wrap } from "./utils/math/wrap";
 import { clamp } from "./utils/math/clamp";
 import { generateCssGradient } from "./utils/generateCssGradient";
 
+const labels = {
+  h: "Hue",
+  s: "Sat",
+  l: "Lum"
+};
 interface ColorSliderProps {
   open?: boolean;
-  type: "h" | "s" | "v";
+  type: "h" | "s" | "l";
   hue: number;
   saturation: number;
-  value: number;
+  luminosity: number;
   setVal: React.Dispatch<React.SetStateAction<number>>;
 }
 
@@ -21,7 +26,7 @@ function pauseEvent(e: PointerEvent) {
 }
 
 function ColorSlider(props: ColorSliderProps) {
-  const { hue, saturation, value, setVal, type } = props;
+  const { hue, saturation, luminosity: value, setVal, type } = props;
   const loop = type === "h";
   const reverse = type !== "h";
   const storageKey = `colorSlider-${type}`;
@@ -36,7 +41,7 @@ function ColorSlider(props: ColorSliderProps) {
       yReset = ev.clientY;
     } else {
       const newY = y + (ev.clientY - yReset) * (reverse ? -1 : 1);
-      const adjustedY = loop ? wrap(newY, 0, 360) : clamp(-420 + 60, 0, newY);
+      const adjustedY = loop ? wrap(newY, -360, 0) : clamp(-420 + 60, 0, newY);
       setY(adjustedY);
       setVal(adjustedY);
       localStorage.setItem(storageKey, adjustedY.toFixed(0));
@@ -67,11 +72,11 @@ function ColorSlider(props: ColorSliderProps) {
         <div
           className={`interior ${props.type}`}
           style={{
-            top: loop ? wrap(y, -420 + 60, 0) : clamp(-420 + 60, 0, y),
+            top: y,
             backgroundImage: generateCssGradient(type, hue, saturation, value)
           }}
         ></div>
-        <p>{props.type.toLocaleUpperCase()}</p>
+        <p>{labels[props.type]}</p>
       </div>
     </div>
   );

@@ -30,7 +30,7 @@ function generateCssValueGradient(hue: number, saturation: number) {
 }
 
 export function generateCssGradient(
-  type: "h" | "s" | "v",
+  type: "h" | "s" | "l",
   hue: number,
   saturation: number,
   value: number
@@ -40,7 +40,7 @@ export function generateCssGradient(
       return generateCssHueGradient(saturation, value);
     case "s":
       return generateCssSaturationGradient(hue, value);
-    case "v":
+    case "l":
       return generateCssValueGradient(hue, saturation);
   }
 }

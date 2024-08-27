@@ -46,26 +46,10 @@ body {
 .color {
   top: calc(50% - 30px);
   right: 20px;
-  background-image: linear-gradient(
-    rgb(0, 164, 106),
-    rgb(0, 205, 133),
-    rgb(0, 255, 166)
-  );
   border-color: rgb(255, 255, 255);
-  border-width: 4px;
   cursor: ns-resize !important;
   border-style: solid;
   z-index: -1;
-}
-
-.color.h {
-  top: calc(50% - 104px);
-}
-.color.s {
-  top: calc(50% - 30px);
-}
-.color.v {
-  top: calc(50% + 44px);
 }
 
 .button {
@@ -77,16 +61,42 @@ body {
   cursor: pointer;
 }
 
-.color.button .mask {
-  background-color: rgb(255, 0, 0);
+.color.h {
+  border-radius: 12px 12px 4px 4px;
+  top: calc(50% - 94px);
+  border-width: 4px 4px 0px 4px;
+}
+.color.h .mask {
+  border-radius: 8px 8px 2px 2px;
+}
+
+.color.s {
+  border-radius: 4px;
+  top: calc(50% - 30px);
+  border-width: 0px 4px 0px 4px;
+}
+.color.s .mask {
+  border-radius: 2px 2px 2px 2px;
+}
+
+.color.l {
+  border-radius: 4px 4px 12px 12px;
+  top: calc(50% + 30px);
+  border-width: 0px 4px 4px 4px;
+}
+.color.l .mask {
+  border-radius: 2px 2px 8px 8px;
+}
+
+.color .mask {
+  background-color: rgb(255, 255, 255);
   width: 60px;
   height: 60px;
-  border-radius: 8px;
   position: relative;
   overflow: hidden;
 }
 
-.color.button .mask .interior {
+.color .mask .interior {
   width: 60px;
   height: 420px;
   top: -400px;
@@ -110,7 +120,7 @@ body {
   background-image: linear-gradient(rgb(255, 0, 0) 10%, rgb(127, 127, 127) 90%);
 }
 
-.color.button .mask .interior.v {
+.color.button .mask .interior.l {
   background-image: linear-gradient(
     rgb(255, 255, 255) 10%,
     rgb(255, 0, 0) 50%,
@@ -126,7 +136,7 @@ body {
     1px -1px 0 #000,
     -1px 1px 0 #000,
     1px 1px 0 #000;
-  font-size: 24px;
+  font-size: 18px;
   margin: 4px;
 }
 

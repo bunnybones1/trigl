@@ -50,6 +50,27 @@ body {
   cursor: ns-resize !important;
   border-style: solid;
   z-index: -1;
+  transition:
+    width 0.1s,
+    height 0.1s,
+    border-radius 0.1s,
+    border-width 0.1s;
+}
+
+.mask {
+  transition:
+    width 0.1s,
+    height 0.1s,
+    border-radius 0.1s,
+    border-width 0.1s;
+}
+
+.interior {
+  transition:
+    width 0.1s,
+    height 0.1s,
+    border-radius 0.1s,
+    border-width 0.1s;
 }
 
 .button {
@@ -101,6 +122,18 @@ body {
   height: 420px;
   top: -400px;
   position: absolute;
+}
+.color.h .widerMask {
+  height: 64px !important;
+}
+
+.wider {
+  width: 160px !important;
+  border-top-left-radius: 16px !important;
+  border-bottom-left-radius: 16px !important;
+  border-left-width: 0px !important;
+  border-bottom-width: 0px !important;
+  border-top-width: 0px !important;
 }
 
 .color.button .mask .interior.h {

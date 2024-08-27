@@ -26,6 +26,7 @@ function pauseEvent(e: PointerEvent) {
 }
 
 function ColorSlider(props: ColorSliderProps) {
+  const [sliding, setSliding] = useState(false);
   const { hue, saturation, luminosity: value, setVal, type } = props;
   const loop = type === "h";
   const reverse = type !== "h";
@@ -53,14 +54,16 @@ function ColorSlider(props: ColorSliderProps) {
     document.removeEventListener("pointermove", onPointerMove);
     document.removeEventListener("pointerup", onPointerUp);
     setIsDown(false);
+    setSliding(false);
   };
   return (
     <div
-      className={`color button ${type}`}
+      className={`color button ${type} ${sliding ? "wider" : ""}`}
       onPointerDown={
         !isDown
           ? (ev) => {
               pauseEvent(ev.nativeEvent);
+              setSliding(true);
               document.addEventListener("pointermove", onPointerMove);
               document.addEventListener("pointerup", onPointerUp);
               setIsDown(true);
@@ -68,9 +71,9 @@ function ColorSlider(props: ColorSliderProps) {
           : undefined
       }
     >
-      <div className="mask">
+      <div className={`mask ${sliding ? "wider widerMask" : ""}`}>
         <div
-          className={`interior ${props.type}`}
+          className={`interior ${props.type} ${sliding ? "wider" : ""}`}
           style={{
             top: y,
             backgroundImage: generateCssGradient(type, hue, saturation, value)

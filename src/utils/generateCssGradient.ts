@@ -21,7 +21,7 @@ function generateCssSaturationGradient(hue: number, value: number) {
   );
   return `linear-gradient(${colors})`;
 }
-function generateCssValueGradient(hue: number, saturation: number) {
+function generateCssLuminosityGradient(hue: number, saturation: number) {
   const colors = percents3.map(
     (p, i) =>
       `${__tempColor.setHSL(hue / 360, 1 - saturation / -360, 1 - i / 2).getStyle()} ${p}`
@@ -41,6 +41,6 @@ export function generateCssGradient(
     case "s":
       return generateCssSaturationGradient(hue, value);
     case "l":
-      return generateCssValueGradient(hue, saturation);
+      return generateCssLuminosityGradient(hue, saturation);
   }
 }

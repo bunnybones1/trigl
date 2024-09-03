@@ -1,16 +1,11 @@
-import { type PerspectiveCamera, Vector3 } from "three";
+import { type OrthographicCamera, Vector3 } from "three";
 import KeyboardNavigation3D from "./KeyboardNavigation3D";
-import { clamp01 } from "./utils/math/clamp01";
-import { lerp } from "./utils/math/lerp";
-import { unlerp } from "./utils/math/unlerp";
 
 const tempVec3 = new Vector3(0, 0, -1);
 
 type TouchJob = "move" | "look" | "fly";
 const __touchMovementIntentionNormalized = new Vector3();
 
-const fovLow = 30;
-const fovHigh = 90;
 export default class ViewControls {
   stopLookingAround() {
     this.onMouseUp();
@@ -29,11 +24,13 @@ export default class ViewControls {
   lastTouchesY = new Map<number, number>();
   paused = false;
   constructor(
-    private _camera: PerspectiveCamera,
+    private _camera: OrthographicCamera,
     private _canvas: HTMLCanvasElement,
     private _speed = 1
   ) {
     this.keyNav = new KeyboardNavigation3D();
+
+    this.adjustZoom(1, 0, 0);
 
     _canvas.addEventListener("mousedown", this.onMouseDown);
     _canvas.addEventListener("touchstart", this.onTouchStart);
@@ -41,21 +38,56 @@ export default class ViewControls {
     window.addEventListener("touchend", this.onTouchEnd);
     document.addEventListener("mouseup", this.onMouseUp);
 
-    this.fovSlider = unlerp(fovLow, fovHigh, _camera.fov);
     document.addEventListener("wheel", this.onWheel);
   }
-  fovSlider = fovLow;
   onWheel = (event: WheelEvent) => {
     if (this.paused) {
       return;
     }
-    this.fovSlider = clamp01(this.fovSlider + event.deltaY * 0.01);
-    this._camera.fov = lerp(fovLow, fovHigh, this.fovSlider);
-    this._camera.updateProjectionMatrix();
+    const zoom = 1 + event.deltaY * 0.001;
+    this.adjustZoom(zoom, event.clientX, event.clientY);
   };
-  private orbitCamera(deltaX: number, deltaY: number) {
-    this._camera.rotateX(deltaY * -0.01);
-    this._camera.rotateY(deltaX * -0.01);
+  private adjustZoom(zoom: number, x: number, y: number) {
+    const cam = this._camera;
+
+    const width = cam.right - cam.left;
+    const centerX = cam.left + (width * x) / window.innerWidth;
+    cam.left -= centerX;
+    cam.left *= zoom;
+    cam.left += centerX;
+    cam.right -= centerX;
+    cam.right *= zoom;
+    cam.right += centerX;
+
+    const height = cam.top - cam.bottom;
+    const centerY = cam.top - (height * y) / window.innerHeight;
+    cam.bottom -= centerY;
+    cam.bottom *= zoom;
+    cam.bottom += centerY;
+    cam.top -= centerY;
+    cam.top *= zoom;
+    cam.top += centerY;
+
+    const dist = height * 0.5;
+
+    cam.near = -dist * 0.99;
+    cam.far = dist * 200;
+    cam.position.z = -dist;
+    cam.updateMatrixWorld();
+
+    this._camera.updateProjectionMatrix();
+  }
+  private panCamera(deltaX: number, deltaY: number) {
+    const cam = this._camera;
+    const offsetX = (deltaX / window.innerWidth) * (cam.right - cam.left);
+    cam.left -= offsetX;
+    cam.right -= offsetX;
+
+    const offsetY = (deltaY / window.innerHeight) * (cam.top - cam.bottom);
+    cam.top += offsetY;
+    cam.bottom += offsetY;
+
+    cam.updateProjectionMatrix();
   }
 
   private onMouseDown = (event: MouseEvent) => {
@@ -141,7 +173,7 @@ export default class ViewControls {
     if (this.lastMouseX !== null && this.lastMouseY !== null) {
       const deltaX = event.clientX - this.lastMouseX;
       const deltaY = event.clientY - this.lastMouseY;
-      this.orbitCamera(deltaX, deltaY);
+      this.panCamera(deltaX, deltaY);
     }
     this.lastMouseX = event.clientX;
     this.lastMouseY = event.clientY;
@@ -167,7 +199,7 @@ export default class ViewControls {
         const job = this.touchesJobs.get(id);
         switch (job) {
           case "look": {
-            this.orbitCamera(deltaX, deltaY);
+            this.panCamera(deltaX, deltaY);
             break;
           }
           case "move": {

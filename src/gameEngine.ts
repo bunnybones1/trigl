@@ -1,5 +1,4 @@
-import { Color, FogExp2, PCFSoftShadowMap, WebGLRenderer } from "three";
-import { PerspectiveCamera } from "three";
+import { Color, OrthographicCamera, WebGLRenderer } from "three";
 import { Scene } from "three";
 import { Object3D } from "three";
 import type {} from "vite";
@@ -21,49 +20,25 @@ export function getGameEngine() {
     const scene = new Scene();
     scene.matrixAutoUpdate = false;
     scene.matrixWorldAutoUpdate = false;
-    const sceneUi = new Scene();
-    sceneUi.matrixAutoUpdate = false;
-    sceneUi.matrixWorldAutoUpdate = false;
-
-    const CAMERA_FAR = 16 * 4 * 32;
+    const halfWidth = 1920 * 0.5;
+    const halfHeight = 1080 * 0.5;
 
     // Create a camera
-    const camera = new PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.01,
-      CAMERA_FAR
+    const camera = new OrthographicCamera(
+      -halfWidth,
+      halfWidth,
+      halfHeight,
+      -halfHeight,
+      -10000,
+      10000
     );
-
-    // Create a camera
-    const cameraUi = new PerspectiveCamera(
-      30,
-      window.innerWidth / window.innerHeight,
-      0.05,
-      200
-    );
-
-    const params = new URLSearchParams(window.location.search);
 
     scene.add(camera);
     scene.background = new Color(0x5599aa);
-    sceneUi.add(cameraUi);
-    scene.fog = new FogExp2(0x7799bb, 0.001);
-    camera.position.set(
-      Number.parseFloat(params.get("x") || "0"),
-      Number.parseFloat(params.get("y") || "0") + 1.15,
-      Number.parseFloat(params.get("z") || "0")
-    );
     camera.updateMatrixWorld();
-    cameraUi.position.set(0, 0, 100);
-    cameraUi.updateMatrixWorld();
 
     // camera.position.set(Number(c[0]), Number(c[1]) + 1, Number(c[2]))
     const renderer = new WebGLRenderer({ logarithmicDepthBuffer: true });
-
-    renderer.shadowMap.enabled = true;
-
-    renderer.shadowMap.type = PCFSoftShadowMap;
 
     renderer.autoClear = false;
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -104,17 +79,13 @@ export function getGameEngine() {
       renderer.clearColor();
       renderer.render(scene, camera);
       renderer.clearDepth();
-      renderer.render(sceneUi, cameraUi);
       game.render();
     }
     renderer.setAnimationLoop(animate);
-    initResizeHandler([camera, cameraUi], renderer);
+    initResizeHandler([camera], renderer);
 
     const gamePivot = new Object3D();
     scene.add(gamePivot);
-
-    const gamePivotUi = new Object3D();
-    sceneUi.add(gamePivotUi);
 
     let game = new Game(gamePivot, camera, renderer);
 
@@ -127,9 +98,6 @@ export function getGameEngine() {
       import.meta.hot.accept("./Game", (mod) => {
         while (gamePivot.children.length > 0) {
           gamePivot.remove(gamePivot.children[0]);
-        }
-        while (gamePivotUi.children.length > 0) {
-          gamePivotUi.remove(gamePivotUi.children[0]);
         }
         game.cleanup();
         game = new mod!.default(gamePivot, camera, renderer);

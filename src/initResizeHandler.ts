@@ -1,14 +1,17 @@
-import type { PerspectiveCamera, WebGLRenderer } from "three";
+import type { OrthographicCamera, WebGLRenderer } from "three";
 
 export function initResizeHandler(
-  cameras: PerspectiveCamera[],
+  cameras: OrthographicCamera[],
   renderer: WebGLRenderer
 ) {
   // Resize handler
   function onWindowResize() {
+    const aspect = window.innerWidth / window.innerHeight;
     for (const camera of cameras) {
-      // Update camera aspect ratio
-      camera.aspect = window.innerWidth / window.innerHeight;
+      const height = camera.top - camera.bottom;
+      const halfWidth = height * 0.5 * aspect;
+      camera.left = -halfWidth;
+      camera.right = halfWidth;
       camera.updateProjectionMatrix();
     }
 
@@ -16,4 +19,5 @@ export function initResizeHandler(
     renderer.setSize(window.innerWidth, window.innerHeight);
   }
   window.addEventListener("resize", onWindowResize);
+  onWindowResize();
 }

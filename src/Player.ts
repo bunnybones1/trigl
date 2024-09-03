@@ -1,10 +1,11 @@
-import { PerspectiveCamera, Raycaster, Vector2, Vector3 } from "three";
+import { OrthographicCamera, Raycaster, Vector2, Vector3 } from "three";
 import Game from "./Game";
 import ViewControls from "./ViewControls";
 import { Signal } from "./utils/Signal";
 import IPlayerIntent from "./types/IPlayerIntent";
 
 const __tempVec2 = new Vector2();
+const screenPos = new Vector2();
 
 const __playerBoundaryPoints: Vector3[] = [];
 const __playerBoundaryPointsKeys: number[] = [];
@@ -29,7 +30,7 @@ export default class Player {
   playerIntentSignal = new Signal<IPlayerIntent>();
   constructor(
     private _game: Game,
-    private _camera: PerspectiveCamera,
+    private _camera: OrthographicCamera,
     canvas: HTMLCanvasElement
   ) {
     _camera.name = "player";
@@ -65,11 +66,12 @@ export default class Player {
       (event.clientX / window.innerWidth) * 2 - 1,
       (event.clientY / window.innerHeight) * -2 + 1
     );
+    screenPos.set(event.clientX, event.clientY);
     this.raycaster.setFromCamera(__tempVec2, this._camera);
     const position = this.raycaster.ray.origin
       .clone()
       .add(this.raycaster.ray.direction);
-    this.playerIntentSignal.emit({ intent, position });
+    this.playerIntentSignal.emit({ intent, position, screenPos });
   }
   onMoveWorldEdit = (event: MouseEvent) => {
     if (!this.editting) {
